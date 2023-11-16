@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2023-11-16 16:20:04">
+<sys_script action="INSERT_OR_UPDATE">
+<abort_action>false</abort_action>
+<access>package_private</access>
+<action_delete>false</action_delete>
+<action_insert>false</action_insert>
+<action_query>false</action_query>
+<action_update>true</action_update>
+<active>true</active>
+<add_message>false</add_message>
+<advanced>true</advanced>
+<change_fields>false</change_fields>
+<client_callable>false</client_callable>
+<collection>sys_progress_worker</collection>
+<condition/>
+<description/>
+<execute_function>false</execute_function>
+<filter_condition table="sys_progress_worker">nameSTARTSWITHFix Script:^state=complete^state_code=success^EQ<item goto="false" or="false" field="name" endquery="false" value="Fix Script:" operator="STARTSWITH" newquery="false"/>
+<item goto="false" or="false" field="state" endquery="false" value="complete" operator="=" newquery="false"/>
+<item goto="false" or="false" field="state_code" endquery="false" value="success" operator="=" newquery="false"/>
+<item goto="false" or="false" field="" endquery="true" value="" operator="=" newquery="false"/>
+</filter_condition>
+<is_rest>false</is_rest>
+<message/>
+<name>Clean Fix Script Result</name>
+<order>100</order>
+<priority>100</priority>
+<rest_method display_value=""/>
+<rest_method_text/>
+<rest_service display_value=""/>
+<rest_service_text/>
+<rest_variables/>
+<role_conditions/>
+<script><![CDATA[(function executeRule(current, previous /*null when async*/ ) {
+
+    var strOldMessage = current.message.toString();
+
+    var arrOldMessage = strOldMessage.split(/\r?\n/); // https://stackoverflow.com/questions/8125709/how-to-split-newline
+
+    var arrNewMessage = [];
+    for (intMessage = 0; intMessage < arrOldMessage.length; intMessage++) {
+		
+		// All user-initiated Fix Script script outputs follow the same formatting
+        var rgxScript = /(\*\*\*\sScript\:)/
+		
+		// In the event of a longer job, SN generates these logging lines
+        var rgxLongRunnerPoller = /(LongRunnerPoller)/
+        var rgxEventHeartbeat = /(EventHeartbeat)/
+		
+        if (arrOldMessage[intMessage].match(rgxScript)) {
+            if (!arrOldMessage[intMessage].match(rgxLongRunnerPoller)) {
+                if (!arrOldMessage[intMessage].match(rgxEventHeartbeat)) {
+                    arrNewMessage.push(arrOldMessage[intMessage]);
+                }
+            }
+        }
+    }
+
+    var strNewMessage = '';
+    arrNewMessage.forEach(function(element, index, array) {
+        strNewMessage += element + '\n';
+    });
+
+    current.setValue('message', strNewMessage);
+    current.update();
+	
+})(current, previous);]]></script>
+<sys_class_name>sys_script</sys_class_name>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2023-10-07 21:08:09</sys_created_on>
+<sys_domain>global</sys_domain>
+<sys_domain_path>/</sys_domain_path>
+<sys_id>25e541b497313110791cf9271153afab</sys_id>
+<sys_mod_count>8</sys_mod_count>
+<sys_name>Clean Fix Script Result</sys_name>
+<sys_overrides display_value=""/>
+<sys_package display_value="Global" source="global">global</sys_package>
+<sys_policy/>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>sys_script_25e541b497313110791cf9271153afab</sys_update_name>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2023-11-16 16:19:50</sys_updated_on>
+<template/>
+<when>after</when>
+</sys_script>
+</unload>
